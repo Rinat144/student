@@ -20,6 +20,7 @@ class StudentResource extends JsonResource
             'email' => $this->email,
             'classroom_name' => $this->classroom_name,
             'lecture' => $this->topic,
+
         ];
     }
 }

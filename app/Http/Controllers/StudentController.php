@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\StudentResource;
+use App\Http\Requests\Student\CreateRequest;
+use App\Http\Requests\Student\UpdateRequest;
 use App\Models\Classroom;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -17,14 +18,46 @@ class StudentController extends Controller
             'name' => $students,
         ]);
     }
+
     public function show(Student $student)
     {
-        $lectures = Student::leftJoin('classrooms', 'students.classroom_id', '=', 'classrooms.id')
-            ->leftJoin('classroom_lectures', 'classrooms.id', '=', 'classroom_lectures.classroom_id')
-            ->leftJoin('lectures', 'classroom_lectures.lecture_id', '=', 'lectures.id')
+        $lectures = Student::rightJoin('classrooms', 'students.classroom_id', '=', 'classrooms.id')
+            ->rightJoin('classroom_lectures', 'classrooms.id', '=', 'classroom_lectures.classroom_id')
+            ->rightJoin('lectures', 'classroom_lectures.lecture_id', '=', 'lectures.id')
             ->where('students.id', '=', $student->id)
-            ->get(['students.id', 'students.name', 'students.email', 'classrooms.name as classroom_name', 'lectures.topic']);
+            ->select(['lectures.topic'])
+            ->pluck('lectures.topic');
+        $classroom = Student::Join('classrooms', 'students.classroom_id', '=', 'classrooms.id')
+            ->where('students.id', '=', $student->id)
+            ->select(['classrooms.name as classroom_name'])
+            ->value('classrooms.classroom_name');
 
-        return StudentResource::collection($lectures);
+        return response()->json([
+            'name' => $student->name,
+            'email' => $student->email,
+            'classroom' => $classroom,
+            'lectures' => $lectures,
+        ]);
+    }
+
+    public function create(CreateRequest $request)
+    {
+        $data = $request->validated();
+        $classroom = Classroom::where('name', $data['classroom_id'])->first();
+        Student::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'classroom_id' => $classroom->id,
+        ]);
+
+        return response()->json([
+           'status' => 'successfully'
+        ]);
+    }
+
+    public function update(UpdateRequest $request, $id)
+    {
+        $data = $request->validated();
+        dd($data);
     }
 }
