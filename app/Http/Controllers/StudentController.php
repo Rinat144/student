@@ -51,13 +51,30 @@ class StudentController extends Controller
         ]);
 
         return response()->json([
-           'status' => 'successfully'
+            'status' => true,
         ]);
     }
 
     public function update(UpdateRequest $request, $id)
     {
         $data = $request->validated();
-        dd($data);
+        $classroom = Classroom::where('name', $data['classroom_id'])
+            ->value('id');
+
+        Student::where('id', $id)->update([
+            'name' => $data['name'],
+            'classroom_id' => $classroom,
+        ]);
+        return response()->json([
+            'status' => true,
+        ]);
+    }
+
+    public function delete($id)
+    {
+        Student::destroy($id);
+        return response()->json([
+            'status' => true
+        ]);
     }
 }
