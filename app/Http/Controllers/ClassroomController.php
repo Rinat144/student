@@ -68,4 +68,9 @@ class ClassroomController extends Controller
            'status' => true,
         ]);
     }
+
+    public function create(Classroom $classroom)
+    {
+        dd($classroom->id);
+    }
 }
