@@ -20,7 +20,7 @@ Route::group(['prefix' => 'classroom'], function (){
     Route::get('/all', [ClassroomController::class, 'all']); //получить список классов
     Route::get('/show/{classroom}', [ClassroomController::class, 'show']); //получить информацию о конкретном классе(название, студенты)
     Route::get('/list/{classroom}', [ClassroomController::class, 'curriculum']); //получить учебный план (список лекций) для конкретного класса
-//    Route::put('/create/{classroom}', [ClassroomController::class, 'create']); //updateOrInsert //создать/обновить учебный план (очередность и состав лекций) для конкретного класса
+    Route::put('/create/{classroom}', [ClassroomController::class, 'create']); //updateOrInsert //создать/обновить учебный план (очередность и состав лекций) для конкретного класса
     Route::post('/create/classroom', [ClassroomController::class, 'createClassroom']); //создать класс
     Route::put('/update/{classroom}', [ClassroomController::class, 'update']); //обновить класс (название)
     Route::delete('/delete/{id}', [ClassroomController::class, 'delete']); //удалить класс (при удалении класса, привязанные студенты должны открепляться от класса, но не удаляться полностью из системы)

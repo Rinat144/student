@@ -71,6 +71,6 @@ class ClassroomController extends Controller
 
     public function create(Classroom $classroom)
     {
-        dd($classroom->id);
+        //
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Lecture\CreateRequest;
+use App\Models\ClassroomLecture;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
 
@@ -65,6 +66,7 @@ class LectureController extends Controller
 
     public function delete(string $id)
     {
+        ClassroomLecture::where('lecture_id', '=', $id)->delete();
         Lecture::destroy($id);
 
         return response()->json([
