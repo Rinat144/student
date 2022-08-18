@@ -6,12 +6,15 @@ use App\Http\Requests\Student\CreateRequest;
 use App\Http\Requests\Student\UpdateRequest;
 use App\Models\Classroom;
 use App\Models\Student;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use phpDocumentor\Reflection\Types\Collection;
+use phpDocumentor\Reflection\Types\Integer;
 
 class StudentController extends Controller
 {
-    public function all()
+
+    public function all(): jsonResponse
     {
         $students = Student::pluck('name');
         return response()->json([
@@ -19,7 +22,7 @@ class StudentController extends Controller
         ]);
     }
 
-    public function show(Student $student)
+    public function show(Student $student): jsonResponse
     {
         $lectures = Student::rightJoin('classrooms', 'students.classroom_id', '=', 'classrooms.id')
             ->rightJoin('classroom_lectures', 'classrooms.id', '=', 'classroom_lectures.classroom_id')
@@ -40,7 +43,7 @@ class StudentController extends Controller
         ]);
     }
 
-    public function create(CreateRequest $request)
+    public function create(CreateRequest $request): jsonResponse
     {
         $data = $request->validated();
         $classroom = Classroom::where('name', $data['classroom_id'])->first();
@@ -55,7 +58,7 @@ class StudentController extends Controller
         ]);
     }
 
-    public function update(UpdateRequest $request, $id)
+    public function update(UpdateRequest $request,Integer $id): jsonResponse
     {
         $data = $request->validated();
         $classroom = Classroom::where('name', $data['classroom_id'])
@@ -70,7 +73,7 @@ class StudentController extends Controller
         ]);
     }
 
-    public function delete($id)
+    public function delete(Integer $id)
     {
         Student::destroy($id);
         return response()->json([

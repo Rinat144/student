@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Classroom\CreateRequests;
 use App\Models\Classroom;
+use App\Models\ClassroomLecture;
 use App\Models\Student;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Integer;
+
 
 class ClassroomController extends Controller
 {
-    public function all()
+
+    public function all(): JsonResponse
     {
         $classrooms = Classroom::pluck('name');
         return response()->json([
@@ -17,7 +22,7 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function show(Classroom $classroom)
+    public function show(Classroom $classroom): JsonResponse
     {
         $students = Student::where('classroom_id', $classroom->id)->pluck('name');
         return response()->json([
@@ -26,7 +31,7 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function curriculum(Classroom $classroom)
+    public function curriculum(Classroom $classroom): JsonResponse
     {
         $lectures = Classroom::leftJoin('classroom_lectures', 'classrooms.id', '=', 'classroom_lectures.classroom_id')
             ->leftJoin('lectures', 'classroom_lectures.lecture_id', '=', 'lectures.id')
@@ -38,7 +43,7 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function createClassroom(CreateRequests $requests)
+    public function createClassroom(CreateRequests $requests): JsonResponse
     {
         $data = $requests->validated();
         Classroom::create([
@@ -50,7 +55,7 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function update(CreateRequests $requests, Classroom $classroom)
+    public function update(CreateRequests $requests, Classroom $classroom): JsonResponse
     {
         $data = $requests->validated();
         $classroom->update($data);
@@ -60,7 +65,7 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function delete($id)
+    public function delete(Integer $id): JsonResponse
     {
         Classroom::destroy($id);
 

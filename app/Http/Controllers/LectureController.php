@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Lecture\CreateRequest;
 use App\Models\ClassroomLecture;
 use App\Models\Lecture;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Integer;
 
 class LectureController extends Controller
 {
-    public function all()
+    public function all(): JsonResponse
     {
         $lectures = Lecture::pluck('topic');
         return response()->json([
@@ -17,7 +19,7 @@ class LectureController extends Controller
         ]);
     }
 
-    public function show(Lecture $lecture)
+    public function show(Lecture $lecture): JsonResponse
     {
         $classroom = Lecture::leftJoin('classroom_lectures', 'lectures.id', '=', 'classroom_lectures.lecture_id')
             ->leftJoin('classrooms', 'classroom_lectures.classroom_id', '=', 'classrooms.id')
@@ -40,7 +42,7 @@ class LectureController extends Controller
         ]);
     }
 
-    public function create(CreateRequest $request)
+    public function create(CreateRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -54,7 +56,7 @@ class LectureController extends Controller
         ]);
     }
 
-    public function put(CreateRequest $request, Lecture $lecture)
+    public function put(CreateRequest $request, Lecture $lecture): JsonResponse
     {
         $data = $request->validated();
         $lecture->update($data);
@@ -64,7 +66,7 @@ class LectureController extends Controller
         ]);
     }
 
-    public function delete(string $id)
+    public function delete(Integer $id): JsonResponse
     {
         ClassroomLecture::where('lecture_id', '=', $id)->delete();
         Lecture::destroy($id);
