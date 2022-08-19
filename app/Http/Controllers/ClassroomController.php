@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Classroom\CreateRequests;
+use App\Http\Requests\Classroom\UpdateCreateRequest;
 use App\Http\Resources\ClassroomResource;
 use App\Models\Classroom;
 use App\Models\ClassroomLecture;
@@ -87,8 +88,12 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function create(Classroom $classroom)
+    public function create(UpdateCreateRequest $request,Classroom $classroom)
     {
-        //
+        $data = $request->validated();
+
+        ClassroomLecture::updateOrInsert([
+          ['classroom_id' => $classroom->id]
+        ]);
     }
 }
