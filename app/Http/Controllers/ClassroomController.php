@@ -3,23 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Classroom\CreateRequests;
+use App\Http\Resources\ClassroomResource;
 use App\Models\Classroom;
 use App\Models\ClassroomLecture;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use phpDocumentor\Reflection\Types\Integer;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 
 class ClassroomController extends Controller
 {
-
-    public function all(): JsonResponse
+    public function all(): ResourceCollection
     {
-        $classrooms = Classroom::pluck('name');
-        return response()->json([
-            'classrooms' => $classrooms,
-        ]);
+        $classrooms = Classroom::all();
+        return ClassroomResource::collection($classrooms);
     }
 
     public function show(Classroom $classroom): JsonResponse
@@ -67,10 +66,24 @@ class ClassroomController extends Controller
 
     public function delete(int $id): JsonResponse
     {
-        Classroom::destroy($id);
-
+        try {
+            DB::beginTransaction();
+            Student::where('classroom_id', '=', $id)
+                ->update([
+                    'classroom_id' => null
+                ]);
+            ClassroomLecture::where('classroom_id', '=', $id)
+                ->delete();
+            Classroom::destroy($id);
+            DB::commit();
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json([
+                'status' => $exception,
+            ]);
+        }
         return response()->json([
-           'status' => true,
+            'status' => true,
         ]);
     }
 

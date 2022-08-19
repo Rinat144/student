@@ -3,9 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use phpDocumentor\Reflection\Types\Integer;
 
-class StudentResource extends JsonResource
+class LectureResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,9 +16,8 @@ class StudentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'classroom_name' => $this->classroom_id,
+            'topic' => $this->topic,
+            'description' => $this->description,
         ];
     }
 }

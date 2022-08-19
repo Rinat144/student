@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Lecture\CreateRequest;
+use App\Http\Resources\LectureResource;
 use App\Models\ClassroomLecture;
 use App\Models\Lecture;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class LectureController extends Controller
 {
-    public function all(): JsonResponse
+    public function all(): ResourceCollection
     {
-        $lectures = Lecture::pluck('topic');
-        return response()->json([
-            'lectures' => $lectures,
-        ]);
+        $lectures = Lecture::all();
+
+        return LectureResource::collection($lectures);
     }
 
     public function show(Lecture $lecture): JsonResponse
@@ -65,8 +67,17 @@ class LectureController extends Controller
 
     public function delete(int $id): JsonResponse
     {
-        ClassroomLecture::where('lecture_id', '=', $id)->delete();
-        Lecture::destroy($id);
+        try {
+            DB::beginTransaction();
+            ClassroomLecture::where('lecture_id', '=', $id)->delete();
+            Lecture::destroy($id);
+            DB::commit();
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json([
+                'status' => $exception,
+            ]);
+        }
 
         return response()->json([
            'status' => true,
