@@ -6,8 +6,6 @@ use App\Http\Requests\Lecture\CreateRequest;
 use App\Models\ClassroomLecture;
 use App\Models\Lecture;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use phpDocumentor\Reflection\Types\Integer;
 
 class LectureController extends Controller
 {
@@ -45,11 +43,10 @@ class LectureController extends Controller
     public function create(CreateRequest $request): JsonResponse
     {
         $data = $request->validated();
+        $lect = new Lecture();
+        $lect->topic = $data['topic'];
 
-        Lecture::insert([
-            'topic' => $data['topic'],
-            'description' => $data['description'],
-        ]);
+        Lecture::create($data);
 
         return response()->json([
            'status' => true,
@@ -66,7 +63,7 @@ class LectureController extends Controller
         ]);
     }
 
-    public function delete(Integer $id): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         ClassroomLecture::where('lecture_id', '=', $id)->delete();
         Lecture::destroy($id);

@@ -65,7 +65,7 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function delete(Integer $id): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         Classroom::destroy($id);
 

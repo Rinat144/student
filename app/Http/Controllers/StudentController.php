@@ -24,16 +24,8 @@ class StudentController extends Controller
 
     public function show(Student $student): jsonResponse
     {
-        $lectures = Student::rightJoin('classrooms', 'students.classroom_id', '=', 'classrooms.id')
-            ->rightJoin('classroom_lectures', 'classrooms.id', '=', 'classroom_lectures.classroom_id')
-            ->rightJoin('lectures', 'classroom_lectures.lecture_id', '=', 'lectures.id')
-            ->where('students.id', '=', $student->id)
-            ->select(['lectures.topic'])
-            ->pluck('lectures.topic');
-        $classroom = Student::Join('classrooms', 'students.classroom_id', '=', 'classrooms.id')
-            ->where('students.id', '=', $student->id)
-            ->select(['classrooms.name as classroom_name'])
-            ->value('classrooms.classroom_name');
+        $lectures = $this->getLectures($student->id);
+        $classroom = $this->getClassRoom($student->id);
 
         return response()->json([
             'name' => $student->name,
@@ -43,14 +35,32 @@ class StudentController extends Controller
         ]);
     }
 
+    private function getLectures(int $id)
+    {
+        return Student::join('classrooms', 'students.classroom_id', '=', 'classrooms.id')
+            ->join('classroom_lectures', 'classrooms.id', '=', 'classroom_lectures.classroom_id')
+            ->join('lectures', 'classroom_lectures.lecture_id', '=', 'lectures.id')
+            ->where('students.id', '=', $id)
+            ->select(['lectures.topic'])
+            ->pluck('lectures.topic');
+    }
+
+    private function getClassRoom(int $id)
+    {
+        return Student::Join('classrooms', 'students.classroom_id', '=', 'classrooms.id')
+            ->where('students.id', '=', $id)
+            ->select(['classrooms.name as classroom_name'])
+            ->value('classrooms.classroom_name');
+    }
+
     public function create(CreateRequest $request): jsonResponse
     {
         $data = $request->validated();
-        $classroom = Classroom::where('name', $data['classroom_id'])->first();
+
         Student::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'classroom_id' => $classroom->id,
+            'classroom_id' => $data['classroom_id'],
         ]);
 
         return response()->json([
@@ -58,7 +68,7 @@ class StudentController extends Controller
         ]);
     }
 
-    public function update(UpdateRequest $request,Integer $id): jsonResponse
+    public function update(UpdateRequest $request, int $id): jsonResponse
     {
         $data = $request->validated();
         $classroom = Classroom::where('name', $data['classroom_id'])
@@ -73,7 +83,7 @@ class StudentController extends Controller
         ]);
     }
 
-    public function delete(Integer $id)
+    public function delete(int $id)
     {
         Student::destroy($id);
         return response()->json([
